@@ -1,0 +1,421 @@
+Medecine
+
+
+---------------------------17 Janvier2020---------------------------------------
+
+Objectif : lecture du livre Holger Hoos
+
+Terme:
+stochastic local search(SLS) = recherche de la meilleur solution dans un ensemble
+			       de solution candidates
+
+SLS -> methodes génériques de résolution de problèmes naturels combinatoires
+       qui necessite parfois des adaptations afin de répondre aux specifications
+       attendues.
+
+SLS -> Beaucoup de methodes utilisé s'inspire de phénomènes naturels.
+
+Resolution:  Generalement espace de solution très grand (echelle exponentielle)
+
+Travelling Salesman Problem -> Objectif:  est de passer par toutes les villes
+			       une seule fois en parcourant la distance la plus
+			       courte possible
+
+			    -> Modelisation: Cela revient à trouver un cycle
+			       hamitonien au sein d'un graphe valué tel que
+			       l'objectif est de trouver le chemin le plus cours
+			       parmis les différents cycle h. possibles du graphe
+			       valué tel que un arc représente un chemin dont ca
+			       distance représente la valeur de cet arc.
+
+
+.(NP/P algo)
+
+Heuristique:
+ -constructive search methods
+
+--------------------------23 Janvier 2020--------------------------------------------
+
+methode de descente(ou classique) :
+	-> principe
+	principe itératif selon lequel on modifie les paramètres de la fonction
+	d'objectif puis on compare les valeurs de retour cette fonction d'objectif.
+	Après comparaison, on conserve les paramètres modifier que dans le cas où
+	la valeur de retour de la fonction d'objectif est inférieur à celle
+	avant modification dans le cas d'une minimisation.Sinon les paramètres avant
+	modification sont conserver. Le processus est itéré jusqu’à ce que toute
+	modification rende le résultat moins bon.
+	Cette methode ne garantie pas de trouver la solution optimale
+	-> Consequence
+	Utilisation de ce principe de recherche du minimum après un certain nombre
+	d'itération finis,conduit pas forcément à un minimum absolu mais local, car
+  on est borné par le nombre d'itération de paramètre de base, et la condition
+	d'arret evoqué plus haut.
+	Cependant des methodes existes afin de se sortir de ce puits local tel que
+	celle consistant à se permettre une dégradation temporaire de la situation,
+	soit un augmentation de l'obejective temporaire afin d'explorer d'autre segment
+	de notre courbe.
+-----------------------------------------------------------------------------------------
+methode de recuis simulé:
+	Figure 4 p.25 Organigramme algo recuit simulé (Patrick Siarry)
+	https://www.youtube.com/watch?v=eBmU1ONJ-os
+	-> prinicpe (inspiré de la physique probab. et de l'algorithme de Metropolie):
+	inspiré de phénomène physique, il s'agit de décrémenter une Temperature
+	graduellement(ici décrementé de 10 à 0 par exemple), puis entre chaque palier
+	de décrementation,effectuer des modifications élémentaires et en fontion de la
+	valeur de la fonction d'objectif, si elle est inférieur on la prend
+	sinon on peut quand meme la prendre mais seulement avec une probabiltés donnée
+	.On réeffectue cette étape jusqu'à atteindre l'équilibre thermodynamique(qui
+	en réalité désigne un nombre d'itération fixé).
+	puis lorsque cet équilibre est atteind, on passe au palier suivant dans les
+	modifications de la température donné.
+	L'algorithme s'arrête lorsque tout les paliers sont atteind.
+
+
+	Le principe est de ce permettre beaucoup de modification au début qui
+	n'améliore pas forcement l'objectif, puis d'être de plus en plus vigoureux
+	dans la selection des voisins.
+	On voit avec l'algorithme que plus delta(E) est grand moins il a de chance
+	d'être pris, et plus la temperature est petite, plus la probabilité d'accepter 
+	un mauvais mouvement est petite. Donc le principe evoqué plus haut est correct
+
+	champ de markov -> ensemble de variable aléatoire dont la distribution future 
+	ne dépend que de l'état present.
+	Dans le cas de l’algorithme du recuit simulé, la succession des états forme une
+	chaîne de Markov, du fait que la probabilité de transition de l’état i à l’état 
+	j ne dépend que de ces deux états, mais pas des états antérieurs à i : en d’autres 
+	termes, tout le passé du système est résumé par l’état courant.
+
+	-> Concequence
+	Facile à implémenter	
+	algorithme générale et adaptatif	
+	Beaucoup de calcul(efficase sur de grand echantillon)
+	Beaucoup de paramètrisation de l'algorithme
+	-> voir Page 58-59 Editeur 
+
+----------------------------24 Janvier 2020-------------------------------------
+
+methode de recherche avec tabous(Tabu Search)
+	Figure 7 p.28 Organigramme algo tabou (Patrick Siarry)
+	https://fr.wikipedia.org/wiki/Recherche_tabou#Principe
+	https://www.youtube.com/watch?v=-k859txmZgI
+	https://homepages.laas.fr/huguet/drupal/sites/homepages.laas.fr.huguet/files/u78/5IL_BOC_Recherche_tabou.pdf
+	-> inspiré du méchanisme de la mémoire humaine
+	-> Il s'agit d'un algorithme plutot simple à mémoire cours terme.
+	-> On part avant tout d'une configuration initiale de nos paramètres, avec une
+		 liste vide(l. Tabou) de position interdite. Ensuite on effectue une
+		 pertubation des paramètres [on contruit l'ensemble des voisins de la
+		 configuration courante accessible en un seul mouvement elementaire (
+		 si ensemble trop grand le reduire en choisissant aléatoirement)], ensuite
+		 on selection le meilleur voisin(en evaluant la fonction d'objectif sur
+		 chacun des éléments de l'ensemble) puis on actualise la solution courante
+		 ,après l'actualisation, nous ajoutons la nouvelle configuration/mouvement
+		 dans la liste de tabou, puis nous réitérons le processus jusqu'à atteindre
+		 notre condition d'arrêt.
+	-> Il existe des mécanismes annexes, comme l’intensification[recherche dans
+		 des ensembles plus prometteur] et la diversification [recherche dans
+	 	des ensembles non/peu explorer], apportent une notable complexité.
+	-> Consequence
+		 complexité raisonnable, mais mecanismes annexes augmente Complexité.
+
+	-> Figure 2.8 – Influence du nombre d’itérations pendant lesquelles on interdit les mouvements.
+	Eviter les listes circulaires à long terme, on peut potentiellement tiré un nombre aléatoire
+	d'itération pendant lesquel la liste de tabou est d'actualité puis la remettre à zéro. 
+	-> Nous pouvons aussi nous retrouver bloquer -> raison pourlaquelle il faut actualisé la liste
+
+----------------------------------------------------------------------------------------------
+
+methode des algorithmes évolutionnaires
+	Figure 9 p.30 Organigramme algo tabou (Patrick Siarry)
+	-> le principe est inspirer de la selection naturelle de Darwin.
+	-> On part d'une population initialement aléatoire,enuite nous évaluons
+	les performances des individus[liste d'entier pour probleme combinatoires]
+	afin de faire une sélection pour la reproduction qui se caractérise par un
+	croisement entre deux individus/ mutation de chaque individus. Ensuite nous
+	évaluons les performances des enfants afin de pouvoir éffecter la selection
+	pour le remplacement[remplacement des individus les moins performant par les
+	enfants], si la condition d'arret est atteinte les meilleurs individus sont
+	trouvés sinon on recommence le processus en partant de la population obtenue
+	-> utliiser dans le cas de plusieurs optimum globaux
+
+	complexité  ++
+----------------------------29 Janvier 2020----------------------------------------------------
+
+methode des algorithmes des fournis
+	Figure 10 p.32 Illustration comportement fourmis (Patrick Siarry)
+	-> le principe repose sur le fait qu'une colonie de fourmis pour 
+	trouver le chemin le plus court entre la fourmilière et la source de 
+	nourriture se base sur le fait que chaque fourmi suit le chemin où le 
+	plus de fourmis sont passé au paravant en déposant à son tour des phéromones
+	sur son chemin.
+	En cas d'obstacle, il y a une adaptation très rapide comme nous pouvons le voir
+	sur la fig.10 . Ainsi ces algorithmes contiennent plusieurs caractéristiques qui 
+	sont très intéressante, tel que la flexibilité(adaption à son env.), la
+	robustesse(colonie survie meme avec quelque individus manquant), la décentralisation
+	(il y à aucune autorité centrale)
+	methode utilisé pour les problèmes évoluant dynamiquement et qui tolère aux pannes.
+
+
+DOMAINE ET TYPE D'OPTIMISATION 
+-> Figure 11 Classification générale des méthodes d’optimisation mono-objectif.
+
+
+
+
+----------------------------31 Janvier/7 Fevrier 2020---------------------------------------
+
+CLassification Multi-Label
+
+La classification multi-Label correspond à l'assignation de un ou plusieurs label à une instance
+(Exemple de photos,Document,etc...).
+Dans la classification ML, nous avons principalement deux méthodes de résolution du problèmes :
+
+-> Ne surtout pas confondre avec la classification multi-classe : qui signifie de classer une donnée
+   parmis plusieurs classes(3 ou plus) (classes A B C D E ou lieu de A B)
+
+--> le problème initial se voit le plus souvent découper en plusieurs petit problèmes de classification
+simple indépendant qui peuvent être résolus par des algorithmes déjà existant. On peut avoir plusieurs
+procédés.
+
+1/ ANALOGIE AVEC NETFLIX 
+
+    . Binary Relevance methods/Label Based transformation 
+ 	Le principe ici est de crée autant de classifieurs binaires que de label puis de les entrainer individuellement
+	à reconnaitre un label spécifique. Ensuite pour une donnée classifier, elle passera par chacun des
+	classifieurs puis aura comme valeur de retour la liste de tout les labels pour lesquelles la donnée aura
+	été évaluée positive(+/- -> binary) par l'un des classifieurs.
+	Cette méthode à deux désavantages
+	-> Elle ne prend pas en compte la corrélation entre les classifieurs.
+	-> Classification incorrecte si seulement un classifieur est défaillant.
+
+    . Classifier Chains(aussi appelé Stacked Binary methods)
+	Il s'agit d'effectuer la classification séquentielle de facon à ce que pour l'évalution par le classifieur i
+	d'une donnée, ce classifieur prenne en compte les prédictions effectués par le classifieurs i-1 .  
+	Cette methode permet ainsi de prendre en compte les correlations entre les différentes données.
+
+    . Label Powerset
+	Cette methode consiste à construire toutes les combinaisons de labels possibles. ainsi nous faisons face à un
+	problème de classification multiclasse.Nous contruisons autant classifieurs binaires(reconnait combinaisons label) 
+	Ex : label pour A B C et les combinaisions potentielles sont [0 0 0], [1 0 0], [0 1 0], [0 0 1], [1 1 0], [1 0 1], [0 1 1], 
+	[1 1 1] ou 1 est positif 0 sinon. --> Instance basd Transformation
+
+	++Cette méthode prend en compte les corrélations existantes entre les différentes classes.
+	++il s'agit d'un procédé qui explore toute les possibilités et qui à de très bon résultats.
+	--Ne peut pas predire des labels inconnus
+	--Cette methode peut dans le pire des cas avoir une complexité exponentionel.
+
+    . Instance-based transformation
+	-> Elimination -> loss the data who has more than one label
+	-> Creation -> fusion des labels de classes pour faire un label contenant tout les précédents -> Cela Augmente nb_classifieurs (dans le cas d'une utilisation
+	de classifieurs binaires, sinon le nb de classifieurs est le meme car après creation on est face à un pb de classification multi-classe)
+	-> decomposition -> suppression d'un des labels d'une instance selon un critère ou aléatoirement afin de former des ensembles de pb single label
+	
+	voir p.187
+
+2/ Ensuite nous avons les algorithmes adaptatifs qui résultent d'algorithmes 
+   existant adapté au type de problèmes.
+	(KNN -> ML-KNN)
+	NT
+	Decisions Tree
+
+
+Rapide référence aux méta-heuristiques --> 2009 BookOfComputation .....
+
+
+
+
+/*
+Evaluation Du score de classification.   -> 
+
+
+*/
+
+----------------------------11 Frévrier 2020----------------------------------------------------
+
+
+Evaluation Du score de classification :
+-> classement? Hamming Loss (Distance de Hamming) 
+
+
+
+Comment modéliser un pb de classification multilabel en problème d'optimisation? [articles]
+
+JE PARLERAI DE CA MAIS JE N'ES PRESQUE RIEN COMPRIS !!!!!!!
+
+Globalement il y a de l'optimisation dans des variantes de SVM [TSVM/ISVM]
+--------------------
+ Pour les modèles de mélanges gaussiens
+(MGM), Multinomial Mixture Models, HMM, etc., l’algorithme EM a été la technique
+d'optimisation standard de facto pour trouver un MLE lorsque les données présentes ne sont
+pas étiquetées. L'algorithme EM pour les HMMs n’est autre que l'algorithme de Baum-Welch
+très connu en reconnaissance phonétique de la parole [Rabiner, 1989].
+--------------------
+
+Dans le cas des données d’apprentissage linéairement non séparables, l'objectif de la
+fonction de l'apprentissage ISVM est de trouver un hyperplan en résolvant un problème
+d'optimisation quadratique. 
+
+
+TSVM /// ISVM
+---------------------
+
+
+JE PARLERAI DE CA AUSSI
+Freitas
+
+Data Mining With an Ant Colony Optimization Algorithm 2002
+
+A new ant colony algorithm for multi-label classification with applications in bioinfomatics 2006
+(MuLAM) (Multi-Label Ant-Miner)
+-----------> replonger plus en détails dans les méta-heuristiques --> ANT COLONY
+Solution sont générer sous forme de règle de classification -> if <antecedent(= x * terms, nb_attribute > x >= 1)> then <consequent>
+chaque terme est sous la forme <attribute, operator, value>
+
+
+
+
+Solution problem d'opitimisation
+
+qu'es-ce-que c'est une solution ? modelisation , fonction d'évalution , voisinage
+
+
+-- Critère de classification
+
+
+Regarder : 
+
+1-
+
+Xu, H., Xu, J.: Designing a multi-label kernel machine with two-objective optimization.
+In: Proceedings of the 2010 international conference on Artificial intelligence and com-
+putational intelligence (AICI’10): Part I, pp. 282–291. Berlin, Heidelberg (2010)
+
+2-
+Huang, G.B., Ding, X., Zhou, H.: Optimization method based extreme learning machine
+for classification. Neurocomputing 74(1-3), 155–163 (2010)
+
+3-
+
+Gonçalves, E.C., Plastino, A., Freitas, A.A.: A genetic algorithm for optimizing the label
+ordering in multi-label classifier chains. In: IEEE 25th International Conference on Tools
+with Artificial Intelligence (ICTAI), pp. 469–476 (2013)
+
+
+4-
+
+Chapelle, O., Sindhwaniand, V., Keerthi, S.S.: Optimization techniques for semisuper-
+vised support vector machines. Journal of Machine Learning Research 9, 203–233 (2008)
+
+5-
+
+Zhang, M.L., Zhou, Z.H.: A Review On Multi-Label Learning Algorithms. IEEE Trans-
+actions on Knowledge and Data Engineering 26(8), 1819 – 1837 (2014)
+
+
+63. Dembczyński, K., Waegeman, W., Cheng, W., Hüllermeier, E.: On label dependence and
+loss minimization in multi-label classification. Machine Learning 88, 5–45 (2012)
+
+
+64. Dempster, A.P., Laird, N.M., Rubin., D.B.: Maximum likelihood from incomplete data
+via the EM algorithm. Journal of the Royal Statistics Society -B 39(1), 1–38 (1977)scholar -> creser multi-label [articles]
+
+8-
+
+Mammadov, M.A., Rubinov, A.M., Yearwood, J.: The study of drug-reaction relation-
+ships using global optimization techniques. Optimization Methods Software 22, 99–126
+(2007)
+ZOTERO -> plugin -> application
+
+
+Optimization and Machine Learning (voir en [Goldberg 94]
+
+
+
+
+
+---------------------------
+
+Initialement nous avons toute les exemples dans un ensemble.m
+
+chaque fourmis produit/decouvre un ensemble de règle candidate(soit une règle pour chaque classe, sinon une seule qui fit avec toute les classes ) 
+
+A la fin de la boucle while générale, tout les exemples bien prédit à travers l'ensemble de règles courant seront retiré de l'ensemble des exemples, ce qui 
+garantie la convergence vers la condition d'arret de la boucle principale qui correspond à un nombre minimal d'exemple non bien prédit.
+
+Dans la boucle while principale, on effectue les etapes suivantes par ordre
+
+- Calcul préliminaire entrant en jeu dans la selection des terms pour la conception d'une règle(->2 calculs :gain d'information :matrice de pheromone pour chaque classe-->initialiser avec depot pheromone)
+
+- Repeat Loop (tant qu'il y a des fourmis contruit une règle candidate)-> correspond à la contruction d'une règle candidate par une fourmi 
+[fourmis commence avec une règle partielle sans 'term' et ensemble de règle RS vide
+-> selection d'un term en fonction des calculs préliminaires soit attribut non utilisé à ce point et classe(s)  encore prédite.
+-> selection du terme , correspond a l'entrer dans le while -> selection basé selon
+des techniques basé sur le dépot de phéromone -> terme accepté si il ne fait pas décroite le nombre d'exemple targeted en dessous de la limite permise (MInexm)  
+-> Après selection -> initialisation d'un ensemble qui enregistre les attributs affecter par la règle-> pour chaque claase essais de prediction des attributs non encore predite(chaque fourmis predit un term par classe--le plus efficient)-> après selecition d'attribut par classe marque attr
+
+
+Algo GEP-LMLC
+
+
+Après generation de la fonction discriminante tout les individus sont 
+Selection des individus, application des oppérations de d'accouplage, mise à jour
+de la population 
+
+Generer les règles de classifications en utilisant les meuilleurs individus (soit ceux avec les  fonctions discriminantes les plus représentatrice de la definition de la classe).
+	
+
+
+
+
+
+
+
+
+-------------------------------------------------------
+
+Ma proposition d'un algo de classification
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
